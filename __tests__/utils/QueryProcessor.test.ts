@@ -107,4 +107,22 @@ describe("QueryProcessor", () => {
         const response: string = QueryProcessor(query);
         expect(response).toBe("");
     })
+
+    test('should respect operator precedence in a mixed expression', () => {
+        const query = "What is 64 plus 58 multiplied by 49?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("2906");
+    })
+
+    test('should evaluate subtraction and multiplication', () => {
+        const query = "What is 10 minus 2 multiplied by 3?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("4");
+    })
+
+    test('should evaluate division before addition', () => {
+        const query = "What is 100 divided by 4 plus 5?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("30");
+    })
 });

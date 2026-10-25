@@ -3,6 +3,67 @@ function extractNumbers(query: string): number[] {
   return matches ? matches.map(Number) : [];
 }
 
+const ARITHMETIC_PATTERN =
+  /\bplus\b|\bminus\b|\bmultiplied\s+by\b|\btimes\b|\bdivided\s+by\b|-?\d+(?:\.\d+)?/gi;
+
+function evaluateArithmetic(query: string): number | null {
+  const tokens = query.match(ARITHMETIC_PATTERN) || [];
+  const values: number[] = [];
+  const operators: string[] = [];
+  let expectingNumber = true;
+
+  for (const token of tokens) {
+    if (/^-?\d+(?:\.\d+)?$/.test(token)) {
+      if (!expectingNumber) {
+        return null;
+      }
+      values.push(Number(token));
+      expectingNumber = false;
+    } else {
+      if (expectingNumber) {
+        return null;
+      }
+      operators.push(token.toLowerCase().replace(/\s+/g, " "));
+      expectingNumber = true;
+    }
+  }
+
+  if (values.length !== operators.length + 1) {
+    return null;
+  }
+
+  const reducedValues = values.slice();
+  const reducedOperators = operators.slice();
+
+  let index = 0;
+  while (index < reducedOperators.length) {
+    const operator = reducedOperators[index];
+    if (
+      operator === "multiplied by" ||
+      operator === "times" ||
+      operator === "divided by"
+    ) {
+      const left = reducedValues[index];
+      const right = reducedValues[index + 1];
+      const result = operator === "divided by" ? left / right : left * right;
+      reducedValues.splice(index, 2, result);
+      reducedOperators.splice(index, 1);
+    } else {
+      index++;
+    }
+  }
+
+  let result = reducedValues[0];
+  for (let i = 0; i < reducedOperators.length; i++) {
+    result =
+      reducedOperators[i] === "plus"
+        ? result + reducedValues[i + 1]
+        : result - reducedValues[i + 1];
+  }
+
+  return result;
+}
+
 function isPrime(value: number): boolean {
   if (!Number.isInteger(value) || value < 2) {
     return false;
@@ -88,12 +149,9 @@ export default function QueryProcessor(query: string): string {
     return bigIntPower(BigInt(base), BigInt(exponent)).toString();
   }
 
-  if (query.toLowerCase().includes("plus")) {
-    const numbers = extractNumbers(query);
-    if (numbers.length === 0) {
-      return "";
-    }
-    return String(numbers.reduce((sum, number) => sum + number, 0));
+  if (/\b(plus|minus|multiplied\s+by|times|divided\s+by)\b/i.test(query)) {
+    const result = evaluateArithmetic(query);
+    return result === null ? "" : String(result);
   }
   return "";
 }
