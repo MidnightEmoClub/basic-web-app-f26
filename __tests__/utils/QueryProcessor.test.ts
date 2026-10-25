@@ -89,4 +89,22 @@ describe("QueryProcessor", () => {
         const response: string = QueryProcessor(query);
         expect(response).toBe("");
     })
+
+    test('should return the primes from the given numbers', () => {
+        const query = "Which of the following numbers are primes: 40, 92, 50, 3, 15?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("3");
+    })
+
+    test('should return all primes from the given numbers', () => {
+        const query = "Which of the following numbers are primes: 2, 4, 7, 9, 11, 1, 0?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("2, 7, 11");
+    })
+
+    test('should return an empty string when none of the numbers are prime', () => {
+        const query = "Which of the following numbers are primes: 4, 6, 8?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("");
+    })
 });

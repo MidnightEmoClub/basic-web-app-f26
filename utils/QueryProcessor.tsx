@@ -3,6 +3,24 @@ function extractNumbers(query: string): number[] {
   return matches ? matches.map(Number) : [];
 }
 
+function isPrime(value: number): boolean {
+  if (!Number.isInteger(value) || value < 2) {
+    return false;
+  }
+  if (value < 4) {
+    return true;
+  }
+  if (value % 2 === 0) {
+    return false;
+  }
+  for (let divisor = 3; divisor * divisor <= value; divisor += 2) {
+    if (value % divisor === 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function bigIntPower(base: bigint, exponent: bigint): bigint {
   let result = BigInt(1);
   let factor = base;
@@ -49,6 +67,14 @@ export default function QueryProcessor(query: string): string {
       return "";
     }
     return String(Math.max(...numbers));
+  }
+
+  if (query.toLowerCase().includes("prime")) {
+    const primes = extractNumbers(query).filter(isPrime);
+    if (primes.length === 0) {
+      return "";
+    }
+    return primes.join(", ");
   }
 
   if (query.toLowerCase().includes("power")) {
