@@ -69,4 +69,24 @@ describe("QueryProcessor", () => {
         const response: string = QueryProcessor(query);
         expect(response).toBe("");
     })
+
+    test('should return the result of a power query', () => {
+        const query = "What is 23 to the power of 65?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe((
+            "32531893445129332611554645425981044974375991037324055622153329695632580166211412428357143"
+        ));
+    })
+
+    test('should return the result of a small power query', () => {
+        const query = "What is 2 to the power of 10?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("1024");
+    })
+
+    test('should return an empty string for a power query without numbers', () => {
+        const query = "What is the power?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("");
+    })
 });

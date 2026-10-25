@@ -3,6 +3,25 @@ function extractNumbers(query: string): number[] {
   return matches ? matches.map(Number) : [];
 }
 
+function bigIntPower(base: bigint, exponent: bigint): bigint {
+  let result = BigInt(1);
+  let factor = base;
+  let remaining = exponent;
+  const two = BigInt(2);
+  const one = BigInt(1);
+  const zero = BigInt(0);
+
+  while (remaining > zero) {
+    if (remaining % two === one) {
+      result *= factor;
+    }
+    factor *= factor;
+    remaining /= two;
+  }
+
+  return result;
+}
+
 export default function QueryProcessor(query: string): string {
   if (query.toLowerCase().includes("shakespeare")) {
     return (
@@ -30,6 +49,17 @@ export default function QueryProcessor(query: string): string {
       return "";
     }
     return String(Math.max(...numbers));
+  }
+
+  if (query.toLowerCase().includes("power")) {
+    const [base, exponent] = extractNumbers(query);
+    if (base === undefined || exponent === undefined) {
+      return "";
+    }
+    if (!Number.isInteger(base) || !Number.isInteger(exponent) || exponent < 0) {
+      return String(Math.pow(base, exponent));
+    }
+    return bigIntPower(BigInt(base), BigInt(exponent)).toString();
   }
 
   if (query.toLowerCase().includes("plus")) {
