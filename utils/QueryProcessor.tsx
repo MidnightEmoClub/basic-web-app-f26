@@ -1,3 +1,8 @@
+function extractNumbers(query: string): number[] {
+  const matches = query.match(/-?\d+(?:\.\d+)?/g);
+  return matches ? matches.map(Number) : [];
+}
+
 export default function QueryProcessor(query: string): string {
   if (query.toLowerCase().includes("shakespeare")) {
     return (
@@ -19,12 +24,20 @@ export default function QueryProcessor(query: string): string {
     return "wentaod"
   }
 
-  if (query.toLowerCase().includes("largest"))  {
-    return "70"
+  if (query.toLowerCase().includes("largest")) {
+    const numbers = extractNumbers(query);
+    if (numbers.length === 0) {
+      return "";
+    }
+    return String(Math.max(...numbers));
   }
 
   if (query.toLowerCase().includes("plus")) {
-    return "176"
+    const numbers = extractNumbers(query);
+    if (numbers.length === 0) {
+      return "";
+    }
+    return String(numbers.reduce((sum, number) => sum + number, 0));
   }
   return "";
 }
