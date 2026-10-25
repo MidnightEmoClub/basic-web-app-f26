@@ -125,4 +125,40 @@ describe("QueryProcessor", () => {
         const response: string = QueryProcessor(query);
         expect(response).toBe("30");
     })
+
+    test('should return the scrabble score of a word', () => {
+        const query = "What is the scrabble score of ruby?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("9");
+    })
+
+    test('should return the scrabble score regardless of case', () => {
+        const query = "What is the scrabble score of Jazz?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("29");
+    })
+
+    test('should return an empty string for a scrabble query without a word', () => {
+        const query = "What is the scrabble score?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("");
+    })
+
+    test('should return the anagram from the given words', () => {
+        const query = "Which of the following is an anagram of listen: banana, google, enlists, silent?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("silent");
+    })
+
+    test('should return all anagrams from the given words', () => {
+        const query = "Which of the following is an anagram of cat: act, dog, tac?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("act, tac");
+    })
+
+    test('should return an empty string when none of the words are anagrams', () => {
+        const query = "Which of the following is an anagram of listen: banana, google?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("");
+    })
 });

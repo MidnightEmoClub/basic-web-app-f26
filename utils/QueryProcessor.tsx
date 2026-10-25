@@ -64,6 +64,24 @@ function evaluateArithmetic(query: string): number | null {
   return result;
 }
 
+const SCRABBLE_VALUES: { [letter: string]: number } = {
+  a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1,
+  j: 8, k: 5, l: 1, m: 3, n: 1, o: 1, p: 3, q: 10, r: 1,
+  s: 1, t: 1, u: 1, v: 4, w: 4, x: 8, y: 4, z: 10,
+};
+
+function sortLetters(word: string): string {
+  return word.toLowerCase().split("").sort().join("");
+}
+
+function scrabbleScore(word: string): number {
+  let score = 0;
+  for (let i = 0; i < word.length; i++) {
+    score += SCRABBLE_VALUES[word[i].toLowerCase()] || 0;
+  }
+  return score;
+}
+
 function isPrime(value: number): boolean {
   if (!Number.isInteger(value) || value < 2) {
     return false;
@@ -120,6 +138,35 @@ export default function QueryProcessor(query: string): string {
 
   if (query.toLowerCase().includes("andrew id")) {
     return "wentaod"
+  }
+
+  if (query.toLowerCase().includes("anagram")) {
+    const targetMatch = query.match(/anagram\s+of\s+([a-z]+)/i);
+    const colonIndex = query.indexOf(":");
+    if (!targetMatch || colonIndex === -1) {
+      return "";
+    }
+
+    const target = sortLetters(targetMatch[1]);
+    const anagrams = query
+      .slice(colonIndex + 1)
+      .split(",")
+      .map((candidate) => candidate.replace(/[^a-z]/gi, ""))
+      .filter((candidate) => candidate.length > 0)
+      .filter((candidate) => sortLetters(candidate) === target);
+
+    if (anagrams.length === 0) {
+      return "";
+    }
+    return anagrams.join(", ");
+  }
+
+  if (query.toLowerCase().includes("scrabble")) {
+    const wordMatch = query.match(/scrabble\s+score\s+(?:of|for)\s+([a-z]+)/i);
+    if (!wordMatch) {
+      return "";
+    }
+    return String(scrabbleScore(wordMatch[1]));
   }
 
   if (query.toLowerCase().includes("largest")) {
