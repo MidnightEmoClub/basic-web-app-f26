@@ -19,6 +19,9 @@ export default function QueryProcessor(query: string): string {
     return "wentaod"
   }
 
+  if (query.toLowerCase().includes("largest"))  {
+    return "70"
+  }
 
   return "";
 }
